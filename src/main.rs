@@ -33,22 +33,26 @@ impl ::std::default::Default for MyConfig {
 
 fn main() -> Result<(), ::std::io::Error> {
     let opt = Cli::from_args();
-    let cfg: MyConfig = confy::load("nordigen2fireflyiii").expect("Failed to load config");
+    let mut cfg: MyConfig = confy::load("nordigen2fireflyiii").expect("Failed to load config");
     println!("{:?}", opt);
     println!("{:?}", cfg);
 
-    save_key(cfg);
+    match opt {
+        Cli::SetToken {} => {save_key(&mut cfg);}
+        Cli::AddAccount {country} => {}
+        Cli::Import {dry_run} => {}
+    }
 
     Ok(())
 }
 
-fn save_key(cfg: MyConfig) {
+fn save_key(cfg: &mut MyConfig) {
     println!("Paste your Nordigen API token below:");
     let mut input = String::new();
     match std::io::stdin().read_line(&mut input) {
         Ok(n) => {
-            println!("{} bytes read", n);
-            println!("{}", input);
+            cfg.api_token = input.trim().to_string();
+            confy::store("nordigen2fireflyiii", cfg);
         }
         Err(error) => println!("error: {}", error),
     }
