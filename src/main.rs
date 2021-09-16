@@ -75,5 +75,20 @@ async fn add_account(country: String, cfg: MyConfig) {
         .await
         .expect("Failed to fetch banks"));
 
-    println!("{:?}", res);
+    for (i, x) in res.iter().enumerate() {
+        println!("{:>2} - {}", i + 1, x.name);
+    }
+
+    println!();
+    println!("Type the ID of the bank:");
+
+    let mut buffer = String::new();
+    std::io::stdin().read_line(&mut buffer).expect("Failed to read from stdin");
+    let bank_id: usize = buffer.trim().parse().expect("Invalid bank ID");
+
+    if bank_id <= 0 || bank_id > res.len() {
+        panic!("Invalid bank ID");
+    }
+
+    println!("Selected bank '{}' ({})", res[bank_id - 1].name, res[bank_id - 1].id);
 }
